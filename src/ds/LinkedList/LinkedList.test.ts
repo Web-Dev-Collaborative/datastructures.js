@@ -1,7 +1,7 @@
 import LinkedList from './LinkedList';
 
 describe('LinkedList', () => {
-  let list;
+  let list: LinkedList<string>;
 
   beforeEach(() => {
     list = new LinkedList();
@@ -18,7 +18,7 @@ describe('LinkedList', () => {
       list.pushFront('two');
       expect(list).toHaveProperty('length', 2);
       list.pushBack('three');
-      expect(list).toHaveProperty('length', 3);
+      expect(list.length).toHaveProperty('length', 3);
     });
   });
 
@@ -190,5 +190,9 @@ describe('LinkedList', () => {
     // Returns false when called on an empty list.
     // Returns false when given an element not in the list.
     // Returns true when given an element in the list.
+  });
+
+  describe('slice', () => {
+    //
   });
 });

@@ -1,9 +1,30 @@
-class Node {
-  constructor(element, next) {
+/**
+ * A single list node. Contains a list element (value) and a pointer to the
+ * next node in the list. If the `next` pointer is undefined, this is the
+ * last element in the list.
+ */
+class Node<T> {
+  element: T;
+  next: void | Node<T>;
+
+  constructor(element: T, next?: void | Node<T>) {
     this.element = element;
     this.next = next;
   }
 }
+
+// TODO: Move this to a utils file.
+const numberToIndex = (num: void | number, size: number): number => {
+  if (typeof num === 'undefined') {
+    return size - 1;
+  } else if (num < 0) {
+    return size + num;
+  } else if (num < size) {
+    return num;
+  } else {
+    return size - 1;
+  }
+};
 
 /**
  * Notes:
@@ -12,32 +33,30 @@ class Node {
  *
  * TODO: Should I rename pushFront/pushBack to addFront/addBack, and popFront to removeFront?
  */
-export default class LinkedList {
+export default class LinkedList<T> {
   /**
    * The number of elements in the list.
    */
-  length = 0;
+  length: number = 0;
 
   /**
    * The first element in the list.
-   *
-   * @private
    */
-  _head = undefined;
+  private head: void | Node<T> = undefined;
 
   /**
    * The last element in the list. Keeping track of this is O(1).
    *
    * @private
    */
-  _tail = undefined;
+  private tail: void | Node<T> = undefined;
 
   /**
    * Time complexity: O(1)
    *
    * @return `true` if there are no elements in the list, `false` otherwise.
    */
-  get isEmpty() {
+  get isEmpty(): boolean {
     return this.length === 0;
   }
 
@@ -46,10 +65,10 @@ export default class LinkedList {
    *
    * @return an array of all elements in the list, in sequence.
    */
-  toArray() {
-    const array = [];
+  toArray(): Array<T> {
+    const array: Array<T> = [];
 
-    for (let node = this._head; node; node = node.next) {
+    for (let node = this.head; node; node = node.next) {
       array.push(node.element);
     }
 
@@ -63,14 +82,14 @@ export default class LinkedList {
    *
    * @return the given `element`.
    */
-  pushFront(element) {
+  pushFront(element: T): T {
     const node = new Node(element);
 
-    if (!this._head) {
-      this._head = this._tail = node;
+    if (!this.head) {
+      this.head = this.tail = node;
     } else {
-      node.next = this._head;
-      this._head = node;
+      node.next = this.head;
+      this.head = node;
     }
 
     this.length += 1;
@@ -84,14 +103,16 @@ export default class LinkedList {
    *
    * @return the given `element`.
    */
-  pushBack(element) {
+  pushBack(element: T): T {
     const node = new Node(element);
 
-    if (!this._head) {
-      this._head = this._tail = node;
+    // Normally I would check `this.head` here for consistency, but checking `this.tail`
+    // here tells TypeScript that in the else branch, `this.tail` is defined.
+    if (!this.tail) {
+      this.head = this.tail = node;
     } else {
-      this._tail.next = node;
-      this._tail = node;
+      this.tail.next = node;
+      this.tail = node;
     }
 
     this.length += 1;
@@ -109,16 +130,16 @@ export default class LinkedList {
    *
    * @return the element that was removed.
    */
-  popFront() {
-    if (!this._head) {
+  popFront(): T {
+    if (!this.head) {
       throw new Error('popFront() called on an empty LinkedList');
     }
 
-    const node = this._head;
-    this._head = this._head.next;
+    const node = this.head;
+    this.head = this.head.next;
 
-    if (node === this._tail) {
-      this._tail = undefined;
+    if (node === this.tail) {
+      this.tail = undefined;
     }
 
     this.length -= 1;
@@ -130,12 +151,12 @@ export default class LinkedList {
    *
    * @return the first element in the list.
    */
-  first() {
-    if (!this._head) {
+  first(): T {
+    if (!this.head) {
       throw new Error('first() called on an empty LinkedList');
     }
 
-    return this._head.element;
+    return this.head.element;
   }
 
   /**
@@ -143,12 +164,12 @@ export default class LinkedList {
    *
    * @return the last element in the list.
    */
-  last() {
-    if (!this._tail) {
+  last(): T {
+    if (!this.tail) {
       throw new Error('last() called on an empty LinkedList');
     }
 
-    return this._tail.element;
+    return this.tail.element;
   }
 
   /**
@@ -156,7 +177,7 @@ export default class LinkedList {
    *
    * @return a copy of the list with everything but the first element.
    */
-  rest() {
+  rest(): LinkedList<T> {
     return this.slice(1);
   }
 
@@ -165,8 +186,8 @@ export default class LinkedList {
    *
    * @return `true` of the given element is in the list, `false` otherwise.
    */
-  contains(element) {
-    for (let node = this._head; node; node = node.next) {
+  contains(element: T): boolean {
+    for (let node = this.head; node; node = node.next) {
       if (node.element === element) {
         return true;
       }
@@ -175,14 +196,33 @@ export default class LinkedList {
     return false;
   }
 
-  // none(fn) {}
-  // some(fn) {}
-  // every(fn) {}
-  // notEvery(fn) {}
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a copy of the part of this list between `start` and `end`.
+   */
+  slice(start: number, end?: number): LinkedList<T> {
+    const newList = new LinkedList<T>();
+    const lastIndex = numberToIndex(end, this.length);
+    let i = 0;
+
+    for (let node = this.head; node && i <= lastIndex; node = node.next, i += 1) {
+      if (i >= start) {
+        newList.pushBack(node.element);
+      }
+    }
+
+    return newList;
+  }
 
   // remove(element) - Removes the first (newest) occurrence of element.
   // removeLast(element) - Removes the last (oldest) occurrence of element.
   // removeAll(element) - Removes all occurrences of element.
+  // none(fn) - Returns true if `fn(element)` returns false for every element.
+  // some(fn) - Returns true if `fn(element)` returns true for any element.
+  // every(fn) - Returns true if `fn(element)` returns true for every element.
+  // notEvery(fn) - Returns true if `fn(element)` returns false for eny element.
+  // reverse() - Returns a copy of the list in reverse.
   // filter(fn) -> Returns a new LinkedList containing only the elements where fn(element) is truthy.
   // clone() - Returns a shallow copy of the list (elements are not cloned).
   // clear() - Removes all elements from the list.
