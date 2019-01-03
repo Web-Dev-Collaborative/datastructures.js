@@ -1,11 +1,11 @@
 # TODO
 
 - [ ] [LinkedList](https://en.wikipedia.org/wiki/Linked_list)
+- [ ] [Stack](<https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>)
 - [ ] ArrayList - Basically JavaScript Array with a bunch of convenience methods.
   - https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html
   - https://www.scala-lang.org/api/2.7.0/scala/List.html
 - [ ] [DoublyLinkedList](https://en.wikipedia.org/wiki/Doubly_linked_list)
-- [ ] [Stack](<https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>)
 - [ ] [Queue](<https://en.wikipedia.org/wiki/Queue_(abstract_data_type)>)
 - [ ] [Dequeue](https://en.wikipedia.org/wiki/Double-ended_queue)
 - [ ] [PriorityQueue](https://en.wikipedia.org/wiki/Priority_queue)
@@ -22,3 +22,4 @@
 - [ ] [BloomFilter](https://en.wikipedia.org/wiki/Bloom_filter)
 - [ ] [Graph](<https://en.wikipedia.org/wiki/Graph_(abstract_data_type)>)
 - [ ] [SkipList](https://en.wikipedia.org/wiki/Skip_list)
+- More!

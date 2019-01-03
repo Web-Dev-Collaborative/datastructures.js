@@ -9,16 +9,16 @@ describe('LinkedList', () => {
 
   describe('length', () => {
     it('has a length of 0 when created', () => {
-      expect(list).toHaveProperty('length', 0);
+      expect(list.length).toEqual(0);
     });
 
     it('reports the correct number of elements as new elements are added', () => {
       list.pushBack('one');
-      expect(list).toHaveProperty('length', 1);
+      expect(list.length).toEqual(1);
       list.pushFront('two');
-      expect(list).toHaveProperty('length', 2);
+      expect(list.length).toEqual(2);
       list.pushBack('three');
-      expect(list.length).toHaveProperty('length', 3);
+      expect(list.length).toEqual(3);
     });
   });
 
@@ -59,9 +59,9 @@ describe('LinkedList', () => {
 
   describe('pushFront', () => {
     it('increases the length of the list by 1', () => {
-      expect(list).toHaveProperty('length', 0);
+      expect(list.length).toEqual(0);
       list.pushFront('one');
-      expect(list).toHaveProperty('length', 1);
+      expect(list.length).toEqual(1);
     });
 
     it('adds the element to the list', () => {
@@ -91,9 +91,9 @@ describe('LinkedList', () => {
 
   describe('pushBack', () => {
     it('increases the length of the list by 1', () => {
-      expect(list).toHaveProperty('length', 0);
+      expect(list.length).toEqual(0);
       list.pushBack('one');
-      expect(list).toHaveProperty('length', 1);
+      expect(list.length).toEqual(1);
     });
 
     it('adds the element to the list', () => {
@@ -126,9 +126,9 @@ describe('LinkedList', () => {
       list.pushBack('one');
       list.pushBack('two');
       list.pushBack('three');
-      expect(list).toHaveProperty('length', 3);
+      expect(list.length).toEqual(3);
       list.popFront();
-      expect(list).toHaveProperty('length', 2);
+      expect(list.length).toEqual(2);
     });
 
     it('removes the first element from the list', () => {
@@ -181,9 +181,117 @@ describe('LinkedList', () => {
   });
 
   describe('rest', () => {
-    // TEST: Returns a copy of the list.
-    // TEST: Returns a list with one fewer elements.
-    // TEST: Returns a list without the first element.
+    it('returns a copy of the list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.rest();
+      expect(newList).not.toBe(list);
+    });
+
+    it(`copies each of the list's internal nodes`, () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.rest();
+
+      // I prefer to use public APIs in tests, but it's necessary to access
+      // the nodes directly here to make sure they are not reused.
+      for (
+        let listNode = list.head, newListNode = newList.head;
+        listNode && newListNode;
+        listNode = listNode.next, newListNode = newListNode.next
+      ) {
+        expect(listNode).not.toBe(newListNode);
+      }
+    });
+
+    it('returns a list that does not share new elements with the old list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      const newList = list.rest();
+      list.pushBack('three');
+      newList.pushBack('four');
+      expect(list.toArray()).toEqual(['one', 'two', 'three']);
+      expect(newList.toArray()).toEqual(['two', 'four']);
+    });
+
+    it('returns a list with one fewer elements', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.rest();
+      expect(newList.length).toEqual(list.length - 1);
+    });
+
+    it('throws when called on an empty list', () => {
+      expect(() => list.rest()).toThrow();
+    });
+
+    it('returns a list without the first element', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.rest();
+      expect(newList.toArray()).toEqual(['two', 'three']);
+    });
+  });
+
+  describe('butLast', () => {
+    it('returns a copy of the list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.butLast();
+      expect(newList).not.toBe(list);
+    });
+
+    it(`copies each of the list's internal nodes`, () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.butLast();
+
+      // I prefer to use public APIs in tests, but it's necessary to access
+      // the nodes directly here to make sure they are not reused.
+      for (
+        let listNode = list.head, newListNode = newList.head;
+        listNode && newListNode;
+        listNode = listNode.next, newListNode = newListNode.next
+      ) {
+        expect(listNode).not.toBe(newListNode);
+      }
+    });
+
+    it('returns a list that does not share new elements with the old list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      const newList = list.butLast();
+      list.pushBack('three');
+      newList.pushBack('four');
+      expect(list.toArray()).toEqual(['one', 'two', 'three']);
+      expect(newList.toArray()).toEqual(['one', 'four']);
+    });
+
+    it('returns a list with one fewer elements', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.butLast();
+      expect(newList.length).toEqual(list.length - 1);
+    });
+
+    it('throws when called on an empty list', () => {
+      expect(() => list.butLast()).toThrow();
+    });
+
+    it('returns a list without the last element', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.butLast();
+      expect(newList.toArray()).toEqual(['one', 'two']);
+    });
   });
 
   describe('contains', () => {

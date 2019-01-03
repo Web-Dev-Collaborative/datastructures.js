@@ -27,9 +27,10 @@ const numberToIndex = (num: void | number, size: number): number => {
 };
 
 /**
- * Notes:
- *   - popBack is not implemented because it would be an O(n) operation. Use DoublyLinkedList instead.
- *   - butLast is not implemented because it would be an O(n) operation. Use DoublyLinkedList instead.
+ * Note: The following methods are not implemented because DoublyLinkedList supports
+ * these operations with significantly improved time complexity at the cost of a few
+ * operations each time the structure is modified:
+ *   - popBack
  *
  * TODO: Should I rename pushFront/pushBack to addFront/addBack, and popFront to removeFront?
  */
@@ -178,7 +179,24 @@ export default class LinkedList<T> {
    * @return a copy of the list with everything but the first element.
    */
   rest(): LinkedList<T> {
+    if (!this.head) {
+      throw new Error('rest() called on an empty LinkedList');
+    }
+
     return this.slice(1);
+  }
+
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a copy of the list with everything but the last element.
+   */
+  butLast(): LinkedList<T> {
+    if (!this.head) {
+      throw new Error('butLast() called on an empty LinkedList');
+    }
+
+    return this.slice(0, -2);
   }
 
   /**
@@ -233,4 +251,5 @@ export default class LinkedList<T> {
   // indexOf(element) - Returns the first index of the given element.
   // lastIndexOf(element) - Returns the last index of the given element.
   // count(element) - Occurrences of the given element in the list
+  // zip(list) - Returns a new list whose elements are pairs of the corresponding elements of this list and the given list.
 }
