@@ -26,12 +26,15 @@ const numberToIndex = (num: void | number, size: number): number => {
   }
 };
 
+export type EqualityFn<T> = (a: T, b: T) => boolean;
+
 /**
  * Note: The following methods are not implemented because DoublyLinkedList supports
  * these operations with significantly improved time complexity at the cost of a few
  * operations each time the structure is modified:
  *   - popBack
  *
+ * TODO: Add a constructor that accepts an optional array of initial elements.
  * TODO: Should I rename pushFront/pushBack to addFront/addBack, and popFront to removeFront?
  */
 export default class LinkedList<T> {
@@ -47,10 +50,25 @@ export default class LinkedList<T> {
 
   /**
    * The last element in the list. Keeping track of this is O(1).
-   *
-   * @private
    */
   private tail: void | Node<T> = undefined;
+
+  /**
+   * The default equality function.
+   */
+  private defaultEqualityFn: EqualityFn<T> = (a, b) => a === b;
+
+  /**
+   * A function used for checking the equality of two elements.
+   */
+  private equalityFn: EqualityFn<T> = this.defaultEqualityFn;
+
+  /**
+   * Sets the function used for checking the equality of two elements.
+   */
+  setEqualityFn(equalityFn?: void | EqualityFn<T>) {
+    this.equalityFn = equalityFn || this.defaultEqualityFn;
+  }
 
   /**
    * Time complexity: O(1)
@@ -204,9 +222,9 @@ export default class LinkedList<T> {
    *
    * @return `true` of the given element is in the list, `false` otherwise.
    */
-  contains(element: T): boolean {
+  contains(element: T, equalityFn: EqualityFn<T> = this.equalityFn): boolean {
     for (let node = this.head; node; node = node.next) {
-      if (node.element === element) {
+      if (equalityFn(node.element, element)) {
         return true;
       }
     }
@@ -246,10 +264,11 @@ export default class LinkedList<T> {
   // clear() - Removes all elements from the list.
   // forEach(fn) - Iterates over all elements in the list.
   // get(n) - Returns the nth element in the list.
-  // slice(first, last = -1) - Returns a part of the list starting at first and ending at last, or the end of the list.
   // contains(element) - Returns true if the given element is in the list.
   // indexOf(element) - Returns the first index of the given element.
   // lastIndexOf(element) - Returns the last index of the given element.
   // count(element) - Occurrences of the given element in the list
   // zip(list) - Returns a new list whose elements are pairs of the corresponding elements of this list and the given list.
+  // zipWithIndex() - Returns a new list whose elements are pairs of this list's elements and their indices.
+  // extendBack(list) - Adds the elements of the given list to the end of this list.
 }

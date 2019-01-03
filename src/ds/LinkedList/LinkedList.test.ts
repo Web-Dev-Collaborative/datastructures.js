@@ -9,36 +9,36 @@ describe('LinkedList', () => {
 
   describe('length', () => {
     it('has a length of 0 when created', () => {
-      expect(list.length).toEqual(0);
+      expect(list.length).toBe(0);
     });
 
     it('reports the correct number of elements as new elements are added', () => {
       list.pushBack('one');
-      expect(list.length).toEqual(1);
+      expect(list.length).toBe(1);
       list.pushFront('two');
-      expect(list.length).toEqual(2);
+      expect(list.length).toBe(2);
       list.pushBack('three');
-      expect(list.length).toEqual(3);
+      expect(list.length).toBe(3);
     });
   });
 
   describe('isEmpty', () => {
     it('is empty when first created', () => {
-      expect(list.isEmpty).toEqual(true);
+      expect(list.isEmpty).toBe(true);
     });
 
     it('is not empty when elements are added', () => {
       list.pushBack('one');
-      expect(list.isEmpty).toEqual(false);
+      expect(list.isEmpty).toBe(false);
     });
 
     it('is empty when all items are removed', () => {
       list.pushBack('one');
       list.pushBack('two');
       list.popFront();
-      expect(list.isEmpty).toEqual(false);
+      expect(list.isEmpty).toBe(false);
       list.popFront();
-      expect(list.isEmpty).toEqual(true);
+      expect(list.isEmpty).toBe(true);
     });
   });
 
@@ -59,27 +59,27 @@ describe('LinkedList', () => {
 
   describe('pushFront', () => {
     it('increases the length of the list by 1', () => {
-      expect(list.length).toEqual(0);
+      expect(list.length).toBe(0);
       list.pushFront('one');
-      expect(list.length).toEqual(1);
+      expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
-      expect(list.contains('one')).toEqual(false);
+      expect(list.contains('one')).toBe(false);
       list.pushFront('one');
-      expect(list.contains('one')).toEqual(true);
+      expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
       list.pushFront('one');
-      expect(list.first()).toEqual('one');
+      expect(list.first()).toBe('one');
       list.pushFront('two');
-      expect(list.first()).toEqual('two');
+      expect(list.first()).toBe('two');
     });
 
     it('returns the given element', () => {
       const element = list.pushFront('one');
-      expect(element).toEqual('one');
+      expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
@@ -91,27 +91,27 @@ describe('LinkedList', () => {
 
   describe('pushBack', () => {
     it('increases the length of the list by 1', () => {
-      expect(list.length).toEqual(0);
+      expect(list.length).toBe(0);
       list.pushBack('one');
-      expect(list.length).toEqual(1);
+      expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
-      expect(list.contains('one')).toEqual(false);
+      expect(list.contains('one')).toBe(false);
       list.pushBack('one');
-      expect(list.contains('one')).toEqual(true);
+      expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
       list.pushBack('one');
-      expect(list.last()).toEqual('one');
+      expect(list.last()).toBe('one');
       list.pushBack('two');
-      expect(list.last()).toEqual('two');
+      expect(list.last()).toBe('two');
     });
 
     it('returns the given element', () => {
       const element = list.pushBack('one');
-      expect(element).toEqual('one');
+      expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
@@ -126,9 +126,9 @@ describe('LinkedList', () => {
       list.pushBack('one');
       list.pushBack('two');
       list.pushBack('three');
-      expect(list.length).toEqual(3);
+      expect(list.length).toBe(3);
       list.popFront();
-      expect(list.length).toEqual(2);
+      expect(list.length).toBe(2);
     });
 
     it('removes the first element from the list', () => {
@@ -136,13 +136,13 @@ describe('LinkedList', () => {
       list.pushBack('two');
       list.pushBack('three');
       list.popFront();
-      expect(list.first()).toEqual('two');
+      expect(list.first()).toBe('two');
     });
 
     it('returns the removed element', () => {
       list.pushBack('one');
       const value = list.popFront();
-      expect(value).toEqual('one');
+      expect(value).toBe('one');
     });
 
     it('throws when remove is called on an empty list', () => {
@@ -153,11 +153,11 @@ describe('LinkedList', () => {
   describe('first', () => {
     it('returns the first element in the list', () => {
       list.pushBack('one');
-      expect(list.first()).toEqual('one');
+      expect(list.first()).toBe('one');
       list.pushBack('two');
-      expect(list.first()).toEqual('one');
+      expect(list.first()).toBe('one');
       list.popFront();
-      expect(list.first()).toEqual('two');
+      expect(list.first()).toBe('two');
     });
 
     it('throws when first is called on an empty list', () => {
@@ -168,11 +168,11 @@ describe('LinkedList', () => {
   describe('last', () => {
     it('returns the last element in the list', () => {
       list.pushBack('one');
-      expect(list.last()).toEqual('one');
+      expect(list.last()).toBe('one');
       list.pushBack('two');
-      expect(list.last()).toEqual('two');
+      expect(list.last()).toBe('two');
       list.popFront();
-      expect(list.last()).toEqual('two');
+      expect(list.last()).toBe('two');
     });
 
     it('throws when last is called on an empty list', () => {
@@ -197,6 +197,10 @@ describe('LinkedList', () => {
 
       // I prefer to use public APIs in tests, but it's necessary to access
       // the nodes directly here to make sure they are not reused.
+      // Note: This is probably a type error because `head` is private, but
+      // intellisense for imported modules is apparently broken in CodeSandbox
+      // right now. A "fix" for this is probably casting `list` and `newList`
+      // to `any` before accessing `head`.
       for (
         let listNode = list.head, newListNode = newList.head;
         listNode && newListNode;
@@ -221,7 +225,7 @@ describe('LinkedList', () => {
       list.pushBack('two');
       list.pushBack('three');
       const newList = list.rest();
-      expect(newList.length).toEqual(list.length - 1);
+      expect(newList.length).toBe(list.length - 1);
     });
 
     it('throws when called on an empty list', () => {
@@ -254,6 +258,10 @@ describe('LinkedList', () => {
 
       // I prefer to use public APIs in tests, but it's necessary to access
       // the nodes directly here to make sure they are not reused.
+      // Note: This is probably a type error because `head` is private, but
+      // intellisense for imported modules is apparently broken in CodeSandbox
+      // right now. A "fix" for this is probably casting `list` and `newList`
+      // to `any` before accessing `head`.
       for (
         let listNode = list.head, newListNode = newList.head;
         listNode && newListNode;
@@ -278,7 +286,7 @@ describe('LinkedList', () => {
       list.pushBack('two');
       list.pushBack('three');
       const newList = list.butLast();
-      expect(newList.length).toEqual(list.length - 1);
+      expect(newList.length).toBe(list.length - 1);
     });
 
     it('throws when called on an empty list', () => {
@@ -295,9 +303,40 @@ describe('LinkedList', () => {
   });
 
   describe('contains', () => {
-    // Returns false when called on an empty list.
-    // Returns false when given an element not in the list.
-    // Returns true when given an element in the list.
+    it('returns false when called on an empty list', () => {
+      expect(list.length).toBe(0);
+      expect(list.contains('one')).toBe(false);
+    });
+
+    it('returns false when given an element not in the list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      expect(list.contains('three')).toBe(false);
+    });
+
+    it('returns true when given an element in the list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      expect(list.contains('one')).toBe(true);
+    });
+
+    it('accepts a function to be used for equality checking', () => {
+      type Person = { name: string };
+      const l = new LinkedList<Person>();
+      l.pushBack({ name: 'Bob' });
+      expect(l.contains({ name: 'Bob' })).toBe(false);
+      expect(l.contains({ name: 'Bob' }, (a, b) => a.name === b.name)).toBe(true);
+    });
+
+    it(`uses the list's equality function if no equality function is given`, () => {
+      type Person = { name: string };
+      const l = new LinkedList<Person>();
+      l.pushBack({ name: 'Bob' });
+      expect(l.contains({ name: 'Bob' })).toBe(false);
+      l.setEqualityFn((a, b) => a.name === b.name);
+      expect(l.contains({ name: 'Bob' })).toBe(true);
+      expect(l.contains({ name: 'Bob' }, (a, b) => a === b)).toBe(false);
+    });
   });
 
   describe('slice', () => {
