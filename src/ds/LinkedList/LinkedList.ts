@@ -27,8 +27,20 @@ const numberToIndex = (num: void | number, size: number): number => {
   }
 };
 
+/**
+ * A function that takes two elements and returns true if they are equivalent.
+ */
 export type EqualityFn<T> = (a: T, b: T) => boolean;
-export type ElementMapperFn<T, K> = (element: T) => K;
+
+/**
+ * A general function that takes an element and returns a boolean value.
+ */
+export type PredicateFn<T> = (a: T) => boolean;
+
+/**
+ * A function that takes an element and returns a new value of any time.
+ */
+export type MapperFn<T, K> = (element: T) => K;
 
 /**
  * Note: The following methods are not implemented because DoublyLinkedList supports
@@ -73,6 +85,8 @@ export default class LinkedList<T> {
   }
 
   /**
+   * Time complexity: O(1)
+   *
    * @return the number of elements in the list.
    */
   get length(): number {
@@ -295,11 +309,45 @@ export default class LinkedList<T> {
    *
    * @return a list containing the results of calling `fn` on each element in this list.
    */
-  map<K>(fn: ElementMapperFn<T, K>): LinkedList<K> {
+  map<K>(mapperFn: MapperFn<T, K>): LinkedList<K> {
     const newList = new LinkedList<K>();
 
     for (let node = this.head; node; node = node.next) {
-      newList.pushBack(fn(node.element));
+      newList.pushBack(mapperFn(node.element));
+    }
+
+    return newList;
+  }
+
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a list containing only the elements where `predicateFn(element)` evaluates to `true`.
+   */
+  filter(predicateFn: PredicateFn<T>): LinkedList<T> {
+    const newList = new LinkedList<T>();
+
+    for (let node = this.head; node; node = node.next) {
+      if (predicateFn(node.element)) {
+        newList.pushBack(node.element);
+      }
+    }
+
+    return newList;
+  }
+
+  // `reject`
+
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a list containing the elements of this list in reverse order.
+   */
+  reverse(): LinkedList<T> {
+    const newList = new LinkedList<T>();
+
+    for (let node = this.head; node; node = node.next) {
+      newList.pushFront(node.element);
     }
 
     return newList;
@@ -312,8 +360,6 @@ export default class LinkedList<T> {
   // some(fn) - Returns true if `fn(element)` returns true for any element.
   // every(fn) - Returns true if `fn(element)` returns true for every element.
   // notEvery(fn) - Returns true if `fn(element)` returns false for eny element.
-  // reverse() - Returns a copy of the list in reverse.
-  // filter(fn) -> Returns a new LinkedList containing only the elements where fn(element) is truthy.
   // clear() - Removes all elements from the list.
   // forEach(fn) - Iterates over all elements in the list.
   // get(n) - Returns the nth element in the list.

@@ -1,21 +1,24 @@
 import LinkedList from './LinkedList';
 
-describe('LinkedList', () => {
-  let list: LinkedList<string>;
+// TODO: This is useful enough to be part of the LinkedList API, but how?
+//   - new LinkedList(1, 2, 3) ?
+//   - LinkedList.of(1, 2, 3) ?
+function listOf<T>(...args: Array<T>): LinkedList<T> {
+  const list = new LinkedList<T>();
+  args.forEach(a => list.pushBack(a));
+  return list;
+}
 
+describe('LinkedList', () => {
   const testListIsACopy = (listFactory, getFirstCorrespondingNode) => {
     it('returns a copy of the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = listFactory(list);
       expect(newList).not.toBe(list);
     });
 
     it(`copies each of the list's internal nodes`, () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = listFactory(list);
 
       // I prefer to use public APIs in tests, but it's necessary to access
@@ -34,17 +37,14 @@ describe('LinkedList', () => {
     });
   };
 
-  beforeEach(() => {
-    list = new LinkedList();
-  });
-
   describe('length', () => {
     it('has a length of 0 when created', () => {
+      const list = listOf();
       expect(list.length).toBe(0);
     });
 
     it('reports the correct number of elements as new elements are added', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(list.length).toBe(1);
       list.pushFront('two');
       expect(list.length).toBe(2);
@@ -55,17 +55,17 @@ describe('LinkedList', () => {
 
   describe('isEmpty', () => {
     it('is empty when first created', () => {
+      const list = listOf();
       expect(list.isEmpty).toBe(true);
     });
 
     it('is not empty when elements are added', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(list.isEmpty).toBe(false);
     });
 
     it('is empty when all items are removed', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       list.popFront();
       expect(list.isEmpty).toBe(false);
       list.popFront();
@@ -75,11 +75,12 @@ describe('LinkedList', () => {
 
   describe('toArray', () => {
     it('returns an empty array when called on an empty list', () => {
+      const list = listOf();
       expect(list.toArray()).toEqual([]);
     });
 
     it('returns an array of all emements in the list, in sequence', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(list.toArray()).toEqual(['one']);
       list.pushBack('two');
       expect(list.toArray()).toEqual(['one', 'two']);
@@ -90,18 +91,21 @@ describe('LinkedList', () => {
 
   describe('pushFront', () => {
     it('increases the length of the list by 1', () => {
+      const list = listOf();
       expect(list.length).toBe(0);
       list.pushFront('one');
       expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
+      const list = listOf();
       expect(list.contains('one')).toBe(false);
       list.pushFront('one');
       expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
+      const list = listOf();
       list.pushFront('one');
       expect(list.first()).toBe('one');
       list.pushFront('two');
@@ -109,11 +113,13 @@ describe('LinkedList', () => {
     });
 
     it('returns the given element', () => {
+      const list = listOf();
       const element = list.pushFront('one');
       expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
+      const list = listOf();
       list.pushFront('one');
       list.pushFront('one');
       expect(list.toArray()).toEqual(['one', 'one']);
@@ -122,18 +128,21 @@ describe('LinkedList', () => {
 
   describe('pushBack', () => {
     it('increases the length of the list by 1', () => {
+      const list = listOf();
       expect(list.length).toBe(0);
       list.pushBack('one');
       expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
+      const list = listOf();
       expect(list.contains('one')).toBe(false);
       list.pushBack('one');
       expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
+      const list = listOf();
       list.pushBack('one');
       expect(list.last()).toBe('one');
       list.pushBack('two');
@@ -141,11 +150,13 @@ describe('LinkedList', () => {
     });
 
     it('returns the given element', () => {
+      const list = listOf();
       const element = list.pushBack('one');
       expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
+      const list = listOf();
       list.pushBack('one');
       list.pushBack('one');
       expect(list.toArray()).toEqual(['one', 'one']);
@@ -154,36 +165,34 @@ describe('LinkedList', () => {
 
   describe('popFront', () => {
     it('removes one element from the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       expect(list.length).toBe(3);
       list.popFront();
       expect(list.length).toBe(2);
     });
 
     it('removes the first element from the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       list.popFront();
       expect(list.first()).toBe('two');
     });
 
     it('returns the removed element', () => {
+      const list = listOf('one');
       list.pushBack('one');
       const value = list.popFront();
       expect(value).toBe('one');
     });
 
     it('throws when remove is called on an empty list', () => {
+      const list = listOf();
       expect(() => list.popFront()).toThrow();
     });
   });
 
   describe('first', () => {
     it('returns the first element in the list', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(list.first()).toBe('one');
       list.pushBack('two');
       expect(list.first()).toBe('one');
@@ -192,13 +201,14 @@ describe('LinkedList', () => {
     });
 
     it('throws when first is called on an empty list', () => {
+      const list = listOf();
       expect(() => list.first()).toThrow();
     });
   });
 
   describe('last', () => {
     it('returns the last element in the list', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(list.last()).toBe('one');
       list.pushBack('two');
       expect(list.last()).toBe('two');
@@ -207,6 +217,7 @@ describe('LinkedList', () => {
     });
 
     it('throws when last is called on an empty list', () => {
+      const list = listOf();
       expect(() => list.last()).toThrow();
     });
   });
@@ -215,8 +226,7 @@ describe('LinkedList', () => {
     testListIsACopy(l => l.rest(), l => l.head.next);
 
     it('returns a list that does not share new elements with the old list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       const newList = list.rest();
       list.pushBack('three');
       newList.pushBack('four');
@@ -225,21 +235,18 @@ describe('LinkedList', () => {
     });
 
     it('returns a list with one fewer elements', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.rest();
       expect(newList.length).toBe(list.length - 1);
     });
 
     it('throws when called on an empty list', () => {
+      const list = listOf();
       expect(() => list.rest()).toThrow();
     });
 
     it('returns a list without the first element', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.rest();
       expect(newList.toArray()).toEqual(['two', 'three']);
     });
@@ -249,8 +256,7 @@ describe('LinkedList', () => {
     testListIsACopy(l => l.butLast(), l => l.head);
 
     it('returns a list that does not share new elements with the old list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       const newList = list.butLast();
       list.pushBack('three');
       newList.pushBack('four');
@@ -259,21 +265,18 @@ describe('LinkedList', () => {
     });
 
     it('returns a list with one fewer elements', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.butLast();
       expect(newList.length).toBe(list.length - 1);
     });
 
     it('throws when called on an empty list', () => {
+      const list = listOf();
       expect(() => list.butLast()).toThrow();
     });
 
     it('returns a list without the last element', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.butLast();
       expect(newList.toArray()).toEqual(['one', 'two']);
     });
@@ -281,38 +284,35 @@ describe('LinkedList', () => {
 
   describe('contains', () => {
     it('returns false when called on an empty list', () => {
+      const list = listOf();
       expect(list.length).toBe(0);
       expect(list.contains('one')).toBe(false);
     });
 
     it('returns false when given an element not in the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       expect(list.contains('three')).toBe(false);
     });
 
     it('returns true when given an element in the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       expect(list.contains('one')).toBe(true);
     });
 
     it('accepts a function to be used for equality checking', () => {
       type Person = { name: string };
-      const l = new LinkedList<Person>();
-      l.pushBack({ name: 'Bob' });
-      expect(l.contains({ name: 'Bob' })).toBe(false);
-      expect(l.contains({ name: 'Bob' }, (a, b) => a.name === b.name)).toBe(true);
+      const list = listOf<Person>({ name: 'Bob' });
+      expect(list.contains({ name: 'Bob' })).toBe(false);
+      expect(list.contains({ name: 'Bob' }, (a, b) => a.name === b.name)).toBe(true);
     });
 
     it(`uses the list's equality function if no equality function is given`, () => {
       type Person = { name: string };
-      const l = new LinkedList<Person>();
-      l.pushBack({ name: 'Bob' });
-      expect(l.contains({ name: 'Bob' })).toBe(false);
-      l.setEqualityFn((a, b) => a.name === b.name);
-      expect(l.contains({ name: 'Bob' })).toBe(true);
-      expect(l.contains({ name: 'Bob' }, (a, b) => a === b)).toBe(false);
+      const list = listOf<Person>({ name: 'Bob' });
+      expect(list.contains({ name: 'Bob' })).toBe(false);
+      list.setEqualityFn((a, b) => a.name === b.name);
+      expect(list.contains({ name: 'Bob' })).toBe(true);
+      expect(list.contains({ name: 'Bob' }, (a, b) => a === b)).toBe(false);
     });
   });
 
@@ -320,24 +320,19 @@ describe('LinkedList', () => {
     testListIsACopy(l => l.slice(), l => l.head);
 
     it('returns a list of the same length when given no arguments', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.slice();
       expect(newList.length).toBe(list.length);
     });
 
     it('returns a full copy of the list when given no arguments', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.slice();
       expect(newList.toArray()).toEqual(list.toArray());
     });
 
     it('returns a list that does not share new elements with the old list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
+      const list = listOf('one', 'two');
       const newList = list.slice();
       list.pushBack('three');
       newList.pushBack('four');
@@ -346,9 +341,7 @@ describe('LinkedList', () => {
     });
 
     it('returns a list that starts at the given start index', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       expect(list.slice(0).toArray()).toEqual(['one', 'two', 'three']);
       expect(list.slice(1).toArray()).toEqual(['two', 'three']);
       expect(list.slice(2).toArray()).toEqual(['three']);
@@ -356,25 +349,19 @@ describe('LinkedList', () => {
     });
 
     it('returns a list that ends at the given end index', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       expect(list.slice(0, 2).toArray()).toEqual(['one', 'two', 'three']);
       expect(list.slice(0, 1).toArray()).toEqual(['one', 'two']);
       expect(list.slice(0, 0).toArray()).toEqual(['one']);
     });
 
     it('returns a list that ends at the last index, given no end index', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       expect(list.slice(0).toArray()).toEqual(['one', 'two', 'three']);
     });
 
     it('subtracts negative end indices from the length of the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       expect(list.slice(0, -1).toArray()).toEqual(['one', 'two', 'three']);
       expect(list.slice(0, -2).toArray()).toEqual(['one', 'two']);
       expect(list.slice(0, -3).toArray()).toEqual(['one']);
@@ -382,11 +369,7 @@ describe('LinkedList', () => {
     });
 
     it('returns a part of the list given both a start and end index', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
-      list.pushBack('four');
-      list.pushBack('five');
+      const list = listOf('one', 'two', 'three', 'four', 'five');
       expect(list.slice(0, 2).toArray()).toEqual(['one', 'two', 'three']);
       expect(list.slice(1, 3).toArray()).toEqual(['two', 'three', 'four']);
       expect(list.slice(1, 4).toArray()).toEqual(['two', 'three', 'four', 'five']);
@@ -395,7 +378,7 @@ describe('LinkedList', () => {
     });
 
     it('fails gracefully if given a start index greater than the last index in the list', () => {
-      list.pushBack('one');
+      const list = listOf('one');
       expect(() => list.slice(2)).not.toThrow();
     });
   });
@@ -404,19 +387,16 @@ describe('LinkedList', () => {
     testListIsACopy(l => l.clone(), l => l.head);
 
     it('creates a full copy of the list', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.clone();
       expect(newList.toArray()).toEqual(list.toArray());
     });
 
     it('returns a list with the same elements from the original list', () => {
       type Person = { name: string };
-      const l = new LinkedList<Person>();
-      const bob = { name: 'Bob' };
-      l.pushBack(bob);
-      const newList = l.clone();
+      const bob: Person = { name: 'Bob' };
+      const list = listOf(bob);
+      const newList = list.clone();
       expect(newList.first()).toBe(bob);
     });
   });
@@ -425,28 +405,55 @@ describe('LinkedList', () => {
     testListIsACopy(l => l.map(a => a), l => l.head);
 
     it('returns a new list of the same size', () => {
-      list.pushBack('one');
-      list.pushBack('two');
-      list.pushBack('three');
+      const list = listOf('one', 'two', 'three');
       const newList = list.map(a => a);
       expect(newList.length).toBe(list.length);
     });
 
     it('returns a list containing the results of calling the element mapper function on each element in the original list', () => {
-      const l = new LinkedList<number>();
-      l.pushBack(1);
-      l.pushBack(2);
-      l.pushBack(3);
-      const newList = l.map(a => a * a);
+      const list = listOf(1, 2, 3);
+      const newList = list.map(a => a * a);
       expect(newList.toArray()).toEqual([1, 4, 9]);
     });
 
     it('can return a new list containing a different type of element', () => {
       type Person = { name: string };
-      list.pushBack('Bob');
-      list.pushBack('Jane');
+      const list = listOf('Bob', 'Jane');
       const newList: LinkedList<Person> = list.map(name => ({ name }));
       expect(newList.toArray()).toEqual([{ name: 'Bob' }, { name: 'Jane' }]);
+    });
+  });
+
+  describe('filter', () => {
+    testListIsACopy(l => l.filter(v => v), l => l.head);
+
+    it('returns a full copy of the list when given the identity predicate', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.filter(v => v);
+      expect(newList.length).toBe(list.length);
+      expect(newList.toArray()).toEqual(list.toArray());
+    });
+
+    it('returns a new list with only the elements where predicateFn(element) evaluates to true', () => {
+      const list = listOf(1, 2, 3, 4, 5);
+      expect(list.filter(v => v % 2 === 0).toArray()).toEqual([2, 4]);
+      expect(list.filter(v => v % 2 === 1).toArray()).toEqual([1, 3, 5]);
+    });
+  });
+
+  describe('reverse', () => {
+    testListIsACopy(l => l.reverse(), l => l.head);
+
+    it('returns a list of the same size', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.reverse();
+      expect(newList.length).toBe(list.length);
+    });
+
+    it('returns a new list with elements in reverse order', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.reverse();
+      expect(newList.toArray()).toEqual(['three', 'two', 'one']);
     });
   });
 });
