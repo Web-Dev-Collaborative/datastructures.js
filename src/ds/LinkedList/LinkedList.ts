@@ -43,7 +43,7 @@ export default class LinkedList<T> {
   /**
    * The number of elements in the list.
    */
-  length: number = 0;
+  private _length: number = 0;
 
   /**
    * The first element in the list.
@@ -73,12 +73,19 @@ export default class LinkedList<T> {
   }
 
   /**
+   * @return the number of elements in the list.
+   */
+  get length(): number {
+    return this._length;
+  }
+
+  /**
    * Time complexity: O(1)
    *
    * @return `true` if there are no elements in the list, `false` otherwise.
    */
   get isEmpty(): boolean {
-    return this.length === 0;
+    return this._length === 0;
   }
 
   /**
@@ -113,7 +120,7 @@ export default class LinkedList<T> {
       this.head = node;
     }
 
-    this.length += 1;
+    this._length += 1;
     return element;
   }
 
@@ -136,7 +143,7 @@ export default class LinkedList<T> {
       this.tail = node;
     }
 
-    this.length += 1;
+    this._length += 1;
     return element;
   }
 
@@ -163,7 +170,7 @@ export default class LinkedList<T> {
       this.tail = undefined;
     }
 
-    this.length -= 1;
+    this._length -= 1;
     return node.element;
   }
 
@@ -250,7 +257,7 @@ export default class LinkedList<T> {
    */
   slice(start: number = 0, end?: number): LinkedList<T> {
     const newList = new LinkedList<T>();
-    const lastIndex = numberToIndex(end, this.length);
+    const lastIndex = numberToIndex(end, this._length);
     let i = 0;
 
     for (let node = this.head; node && i <= lastIndex; node = node.next, i += 1) {
