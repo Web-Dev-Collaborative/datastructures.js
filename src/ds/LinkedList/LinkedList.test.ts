@@ -334,6 +334,66 @@ describe('LinkedList', () => {
     });
   });
 
+  describe('get', () => {
+    it('returns the element at the given index', () => {
+      const list = listOf('one', 'two', 'three');
+      expect(list.get(0)).toBe('one');
+      expect(list.get(1)).toBe('two');
+      expect(list.get(2)).toBe('three');
+    });
+
+    it('accepts negative indices for accessing elements from the end of the list', () => {
+      const list = listOf('one', 'two', 'three');
+      expect(list.get(-1)).toBe('three');
+      expect(list.get(-2)).toBe('two');
+      expect(list.get(-3)).toBe('one');
+    });
+
+    it(`throws when given a negative index whose absolute value is larger than the list's length`, () => {
+      const list = listOf(1, 2, 3);
+      expect(() => list.get(-4)).toThrow();
+    });
+
+    it('throws when given an index greater than the last index in the list', () => {
+      const list = listOf(1, 2, 3);
+      expect(() => list.get(3)).toThrow();
+    });
+  });
+
+  describe('forEach', () => {
+    it('calls the given callback function for each element in the list', () => {
+      type Value = { seen: boolean };
+      const a = { seen: false };
+      const b = { seen: false };
+      const list = listOf(a, b);
+      // TODO: This is not type-compatible with LinkedList.forEach because it doesn't
+      // accept a second index parameter, but it's hard to build that because CodeSandbox
+      // isn't giving me type hints or error messages in this file.
+      list.forEach(v => (v.seen = true));
+      expect(a.seen).toBe(true);
+      expect(b.seen).toBe(true);
+    });
+
+    it('iterates over each element in order', () => {
+      const values = [];
+      const list = listOf('a', 'b', 'c');
+      list.forEach(v => values.push(v));
+      expect(values).toEqual(['a', 'b', 'c']);
+    });
+
+    it(`passes the element's index as an optional second parameter to the callback function`, () => {
+      const indices = [];
+      const list = listOf('a', 'b', 'c');
+      list.forEach((v, index) => indices.push(index));
+      expect(indices).toEqual([0, 1, 2]);
+    });
+
+    it('does not throw if called on an empty list', () => {
+      const list = listOf();
+      expect(() => list.forEach(v => {})).not.toThrow();
+    });
+  });
+
   describe('contains', () => {
     it('returns false when called on an empty list', () => {
       const list = listOf();
@@ -405,6 +465,11 @@ describe('LinkedList', () => {
       expect(list.slice(0, 2).toArray()).toEqual(['one', 'two', 'three']);
       expect(list.slice(0, 1).toArray()).toEqual(['one', 'two']);
       expect(list.slice(0, 0).toArray()).toEqual(['one']);
+    });
+
+    it('clamps the end index to the last index in the list', () => {
+      const list = listOf('one', 'two', 'three');
+      expect(list.slice(0, 10).toArray()).toEqual(['one', 'two', 'three']);
     });
 
     it('returns a list that ends at the last index, given no end index', () => {

@@ -1,51 +1,54 @@
+import { numberToIndex } from '../utils';
+import { IndexOutOfBoundsError } from '../utils/errors';
+
 /**
  * A single list node. Contains a list element (value) and a pointer to the
  * next node in the list. If the `next` pointer is undefined, this is the
  * last element in the list.
  */
 class Node<T> {
-  element: T;
-  next: void | Node<T>;
-
-  constructor(element: T, next?: void | Node<T>) {
-    this.element = element;
-    this.next = next;
-  }
+  constructor(public element: T, public next?: void | Node<T>) {}
 }
-
-// TODO: Move this to a utils file.
-// TODO: Test me.
-const numberToIndex = (num: void | number, size: number): number => {
-  if (typeof num === 'undefined') {
-    return size - 1;
-  } else if (num < 0) {
-    return size + num;
-  } else if (num < size) {
-    return num;
-  } else {
-    return size - 1;
-  }
-};
 
 /**
  * A function that takes two elements and returns true if they are equivalent.
+ *
+ * TODO: This doesn't really belong to LinkedList.
  */
 export type EqualityFn<T> = (a: T, b: T) => boolean;
 
 /**
  * A general function that takes an element and returns a boolean value.
+ *
+ * TODO: This doesn't really belong to LinkedList.
  */
 export type PredicateFn<T> = (a: T) => boolean;
 
 /**
  * A function that takes an element and returns a new value of any time.
+ *
+ * TODO: This doesn't really belong to LinkedList.
  */
 export type MapperFn<T, K> = (element: T) => K;
 
 /**
+ * A general function that takes an element.
+ *
+ * TODO: This doesn't really belong to LinkedList.
+ */
+export type CallbackFn<T> = (element: T) => void;
+
+/**
+ * A general function that takes an element and its index.
+ *
+ * TODO: This doesn't really belong to LinkedList.
+ */
+export type CallbackWithIndexFn<T> = (element: T, index: number) => void;
+
+/**
  * Note: The following methods are not implemented because DoublyLinkedList supports
- * these operations with significantly improved time complexity at the cost of a few
- * operations each time the structure is modified:
+ * these operations with significantly improved time or space complexity at the cost
+ * of a few operations each time the structure is modified:
  *   - popBack
  *
  * TODO: Add a constructor that accepts an optional array of initial elements.
@@ -173,7 +176,7 @@ export default class LinkedList<T> {
    */
   removeFront(): T {
     if (!this.head) {
-      throw new Error('removeFront() called on an empty LinkedList');
+      throw new Error('LinkedList:removeFront() called on an empty list');
     }
 
     const node = this.head;
@@ -202,7 +205,7 @@ export default class LinkedList<T> {
    */
   first(): T {
     if (!this.head) {
-      throw new Error('first() called on an empty LinkedList');
+      throw new Error('LinkedList:first() called on an empty list');
     }
 
     return this.head.element;
@@ -215,7 +218,7 @@ export default class LinkedList<T> {
    */
   last(): T {
     if (!this.tail) {
-      throw new Error('last() called on an empty LinkedList');
+      throw new Error('LinkedList:last() called on an empty list');
     }
 
     return this.tail.element;
@@ -231,7 +234,7 @@ export default class LinkedList<T> {
    */
   rest(): LinkedList<T> {
     if (!this.head) {
-      throw new Error('rest() called on an empty LinkedList');
+      throw new Error('LinkedList:rest() called on an empty list');
     }
 
     return this.slice(1);
@@ -247,10 +250,49 @@ export default class LinkedList<T> {
    */
   butLast(): LinkedList<T> {
     if (!this.head) {
-      throw new Error('butLast() called on an empty LinkedList');
+      throw new Error('LinkedList:butLast() called on an empty list');
     }
 
     return this.slice(0, -2);
+  }
+
+  /**
+   * @return the element at the given index.
+   */
+  get(index: number): T {
+    const len = this.length;
+    const convertedIndex = numberToIndex(index, len);
+
+    if (convertedIndex < 0 || convertedIndex > len - 1) {
+      throw new IndexOutOfBoundsError(`LinkedList:get(${index}) on a list of length ${len}`);
+    }
+
+    // Initially I wrote this as a for-loop like all of the other iteration in LinkedList,
+    // but there was too much going on so I've broken it out.
+    let i = 0;
+    let node = this.head;
+
+    while (node && i < len) {
+      if (i === convertedIndex) {
+        return node.element;
+      }
+
+      i += 1;
+      node = node.next;
+    }
+
+    // This should be theoretically impossible, unless someone has tampered with the
+    // nodes or there is a bug.
+    throw new Error(`LinkedList:get() could not find the element at index ${convertedIndex}`);
+  }
+
+  /**
+   * Calls `callbackFn` for each element in the list.
+   */
+  forEach(callbackFn: CallbackWithIndexFn<T>): void {
+    for (let node = this.head, i = 0; node; node = node.next, i += 1) {
+      callbackFn(node.element, i);
+    }
   }
 
   /**
@@ -278,7 +320,7 @@ export default class LinkedList<T> {
    */
   slice(start: number = 0, end?: number): LinkedList<T> {
     const newList = new LinkedList<T>();
-    const lastIndex = numberToIndex(end, this._length);
+    const lastIndex = numberToIndex(end, this._length, true);
     let i = 0;
 
     for (let node = this.head; node && i <= lastIndex; node = node.next, i += 1) {
@@ -382,10 +424,6 @@ export default class LinkedList<T> {
   // some(fn) - Returns true if `fn(element)` returns true for any element.
   // every(fn) - Returns true if `fn(element)` returns true for every element.
   // notEvery(fn) - Returns true if `fn(element)` returns false for eny element.
-  // clear() - Removes all elements from the list.
-  // forEach(fn) - Iterates over all elements in the list.
-  // get(n) - Returns the nth element in the list.
-  // contains(element) - Returns true if the given element is in the list.
   // indexOf(element) - Returns the first index of the given element.
   // lastIndexOf(element) - Returns the last index of the given element.
   // count(element) - Occurrences of the given element in the list
