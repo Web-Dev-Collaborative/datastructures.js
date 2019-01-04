@@ -14,6 +14,7 @@ class Node<T> {
 }
 
 // TODO: Move this to a utils file.
+// TODO: Test me.
 const numberToIndex = (num: void | number, size: number): number => {
   if (typeof num === 'undefined') {
     return size - 1;
@@ -237,7 +238,7 @@ export default class LinkedList<T> {
    *
    * @return a copy of the part of this list between `start` and `end`.
    */
-  slice(start: number, end?: number): LinkedList<T> {
+  slice(start: number = 0, end?: number): LinkedList<T> {
     const newList = new LinkedList<T>();
     const lastIndex = numberToIndex(end, this.length);
     let i = 0;
