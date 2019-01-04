@@ -5,7 +5,7 @@ import LinkedList from './LinkedList';
 //   - LinkedList.of(1, 2, 3) ?
 function listOf<T>(...args: Array<T>): LinkedList<T> {
   const list = new LinkedList<T>();
-  args.forEach(a => list.pushBack(a));
+  args.forEach(a => list.addBack(a));
   return list;
 }
 
@@ -46,9 +46,9 @@ describe('LinkedList', () => {
     it('reports the correct number of elements as new elements are added', () => {
       const list = listOf('one');
       expect(list.length).toBe(1);
-      list.pushFront('two');
+      list.addFront('two');
       expect(list.length).toBe(2);
-      list.pushBack('three');
+      list.addBack('three');
       expect(list.length).toBe(3);
     });
   });
@@ -66,9 +66,9 @@ describe('LinkedList', () => {
 
     it('is empty when all items are removed', () => {
       const list = listOf('one', 'two');
-      list.popFront();
+      list.removeFront();
       expect(list.isEmpty).toBe(false);
-      list.popFront();
+      list.removeFront();
       expect(list.isEmpty).toBe(true);
     });
   });
@@ -82,111 +82,163 @@ describe('LinkedList', () => {
     it('returns an array of all emements in the list, in sequence', () => {
       const list = listOf('one');
       expect(list.toArray()).toEqual(['one']);
-      list.pushBack('two');
+      list.addBack('two');
       expect(list.toArray()).toEqual(['one', 'two']);
-      list.pushBack('three');
+      list.addBack('three');
       expect(list.toArray()).toEqual(['one', 'two', 'three']);
     });
   });
 
-  describe('pushFront', () => {
+  describe('addFront', () => {
     it('increases the length of the list by 1', () => {
       const list = listOf();
       expect(list.length).toBe(0);
-      list.pushFront('one');
+      list.addFront('one');
       expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
       const list = listOf();
       expect(list.contains('one')).toBe(false);
-      list.pushFront('one');
+      list.addFront('one');
       expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
       const list = listOf();
-      list.pushFront('one');
+      list.addFront('one');
       expect(list.first()).toBe('one');
-      list.pushFront('two');
+      list.addFront('two');
       expect(list.first()).toBe('two');
     });
 
     it('returns the given element', () => {
       const list = listOf();
-      const element = list.pushFront('one');
+      const element = list.addFront('one');
       expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
       const list = listOf();
-      list.pushFront('one');
-      list.pushFront('one');
+      list.addFront('one');
+      list.addFront('one');
       expect(list.toArray()).toEqual(['one', 'one']);
     });
   });
 
-  describe('pushBack', () => {
+  describe('addBack', () => {
     it('increases the length of the list by 1', () => {
       const list = listOf();
       expect(list.length).toBe(0);
-      list.pushBack('one');
+      list.addBack('one');
       expect(list.length).toBe(1);
     });
 
     it('adds the element to the list', () => {
       const list = listOf();
       expect(list.contains('one')).toBe(false);
-      list.pushBack('one');
+      list.addBack('one');
       expect(list.contains('one')).toBe(true);
     });
 
     it('adds the element to the front of the list', () => {
       const list = listOf();
-      list.pushBack('one');
+      list.addBack('one');
       expect(list.last()).toBe('one');
-      list.pushBack('two');
+      list.addBack('two');
       expect(list.last()).toBe('two');
     });
 
     it('returns the given element', () => {
       const list = listOf();
-      const element = list.pushBack('one');
+      const element = list.addBack('one');
       expect(element).toBe('one');
     });
 
     it('allows the same element to be added multiple times', () => {
       const list = listOf();
-      list.pushBack('one');
-      list.pushBack('one');
+      list.addBack('one');
+      list.addBack('one');
       expect(list.toArray()).toEqual(['one', 'one']);
     });
   });
 
-  describe('popFront', () => {
+  describe('removeFront', () => {
     it('removes one element from the list', () => {
       const list = listOf('one', 'two', 'three');
       expect(list.length).toBe(3);
-      list.popFront();
+      list.removeFront();
       expect(list.length).toBe(2);
     });
 
     it('removes the first element from the list', () => {
       const list = listOf('one', 'two', 'three');
-      list.popFront();
+      list.removeFront();
       expect(list.first()).toBe('two');
     });
 
     it('returns the removed element', () => {
       const list = listOf('one');
-      list.pushBack('one');
-      const value = list.popFront();
+      list.addBack('one');
+      const value = list.removeFront();
       expect(value).toBe('one');
     });
 
     it('throws when remove is called on an empty list', () => {
       const list = listOf();
-      expect(() => list.popFront()).toThrow();
+      expect(() => list.removeFront()).toThrow();
+    });
+  });
+
+  describe('removeAll', () => {
+    it('fails gracefully if called on an empty list', () => {
+      const list = listOf();
+      expect(() => list.removeAll()).not.toThrow();
+    });
+
+    it('removes all elements from the list', () => {
+      const list = listOf(1, 2, 3);
+      expect(list.toArray()).toEqual([1, 2, 3]);
+      list.removeAll();
+      expect(list.toArray()).toEqual([]);
+    });
+
+    it(`sets the list's length to zero`, () => {
+      const list = listOf(1, 2, 3);
+      list.removeAll();
+      expect(list.length).toBe(0);
+    });
+
+    it('removes the head node', () => {
+      // It's necessary to dig into the internals here.
+      const list = listOf(1, 2, 3);
+      expect(list.head).toBeDefined();
+      list.removeAll();
+      expect(list.head).toBeUndefined();
+    });
+
+    it('removes the tail node', () => {
+      // It's necessary to dig into the internals here.
+      const list = listOf(1, 2, 3);
+      expect(list.tail).toBeDefined();
+      list.removeAll();
+      expect(list.tail).toBeUndefined();
+    });
+
+    it('returns nothing', () => {
+      const list = listOf(1, 2, 3);
+      expect(list.removeAll()).toBeUndefined();
+    });
+
+    it('does not break the list', () => {
+      const list = listOf('one', 'two', 'three');
+      list.removeAll();
+      expect(list.toArray()).toEqual([]);
+      list.addBack('four');
+      list.addBack('five');
+      expect(list.toArray()).toEqual(['four', 'five']);
+      list.removeAll();
+      expect(list.toArray()).toEqual([]);
     });
   });
 
@@ -194,9 +246,9 @@ describe('LinkedList', () => {
     it('returns the first element in the list', () => {
       const list = listOf('one');
       expect(list.first()).toBe('one');
-      list.pushBack('two');
+      list.addBack('two');
       expect(list.first()).toBe('one');
-      list.popFront();
+      list.removeFront();
       expect(list.first()).toBe('two');
     });
 
@@ -210,9 +262,9 @@ describe('LinkedList', () => {
     it('returns the last element in the list', () => {
       const list = listOf('one');
       expect(list.last()).toBe('one');
-      list.pushBack('two');
+      list.addBack('two');
       expect(list.last()).toBe('two');
-      list.popFront();
+      list.removeFront();
       expect(list.last()).toBe('two');
     });
 
@@ -228,8 +280,8 @@ describe('LinkedList', () => {
     it('returns a list that does not share new elements with the old list', () => {
       const list = listOf('one', 'two');
       const newList = list.rest();
-      list.pushBack('three');
-      newList.pushBack('four');
+      list.addBack('three');
+      newList.addBack('four');
       expect(list.toArray()).toEqual(['one', 'two', 'three']);
       expect(newList.toArray()).toEqual(['two', 'four']);
     });
@@ -258,8 +310,8 @@ describe('LinkedList', () => {
     it('returns a list that does not share new elements with the old list', () => {
       const list = listOf('one', 'two');
       const newList = list.butLast();
-      list.pushBack('three');
-      newList.pushBack('four');
+      list.addBack('three');
+      newList.addBack('four');
       expect(list.toArray()).toEqual(['one', 'two', 'three']);
       expect(newList.toArray()).toEqual(['one', 'four']);
     });
@@ -334,8 +386,8 @@ describe('LinkedList', () => {
     it('returns a list that does not share new elements with the old list', () => {
       const list = listOf('one', 'two');
       const newList = list.slice();
-      list.pushBack('three');
-      newList.pushBack('four');
+      list.addBack('three');
+      newList.addBack('four');
       expect(list.toArray()).toEqual(['one', 'two', 'three']);
       expect(newList.toArray()).toEqual(['one', 'two', 'four']);
     });
@@ -434,10 +486,41 @@ describe('LinkedList', () => {
       expect(newList.toArray()).toEqual(list.toArray());
     });
 
+    it('returns an empty list when given a predicate that always returns false', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.filter(v => false);
+      expect(newList.length).toBe(0);
+      expect(newList.toArray()).toEqual([]);
+    });
+
     it('returns a new list with only the elements where predicateFn(element) evaluates to true', () => {
       const list = listOf(1, 2, 3, 4, 5);
       expect(list.filter(v => v % 2 === 0).toArray()).toEqual([2, 4]);
       expect(list.filter(v => v % 2 === 1).toArray()).toEqual([1, 3, 5]);
+    });
+  });
+
+  describe('reject', () => {
+    testListIsACopy(l => l.reject(v => v), l => l.head);
+
+    it('returns a full copy of the list when given a predicate that always returns false', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.reject(v => false);
+      expect(newList.length).toBe(list.length);
+      expect(newList.toArray()).toEqual(list.toArray());
+    });
+
+    it('returns an empty list when given the identity predicate', () => {
+      const list = listOf('one', 'two', 'three');
+      const newList = list.reject(v => v);
+      expect(newList.length).toBe(0);
+      expect(newList.toArray()).toEqual([]);
+    });
+
+    it('returns a new list with only the elements where predicateFn(element) evaluates to false', () => {
+      const list = listOf(1, 2, 3, 4, 5);
+      expect(list.reject(v => v % 2 === 0).toArray()).toEqual([1, 3, 5]);
+      expect(list.reject(v => v % 2 === 1).toArray()).toEqual([2, 4]);
     });
   });
 

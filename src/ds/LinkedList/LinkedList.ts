@@ -49,7 +49,6 @@ export type MapperFn<T, K> = (element: T) => K;
  *   - popBack
  *
  * TODO: Add a constructor that accepts an optional array of initial elements.
- * TODO: Should I rename pushFront/pushBack to addFront/addBack, and popFront to removeFront?
  */
 export default class LinkedList<T> {
   /**
@@ -124,7 +123,7 @@ export default class LinkedList<T> {
    *
    * @return the given `element`.
    */
-  pushFront(element: T): T {
+  addFront(element: T): T {
     const node = new Node(element);
 
     if (!this.head) {
@@ -145,7 +144,7 @@ export default class LinkedList<T> {
    *
    * @return the given `element`.
    */
-  pushBack(element: T): T {
+  addBack(element: T): T {
     const node = new Node(element);
 
     // Normally I would check `this.head` here for consistency, but checking `this.tail`
@@ -164,17 +163,17 @@ export default class LinkedList<T> {
   /**
    * Removes the first element from the list.
    *
-   * Time complexity: O(1)
-   *
-   * Note: I chose to name this `popFront` rather than `remove` for a few reasons:
+   * Note: I chose to name this `removeFront` rather than `remove` for a few reasons:
    *    1. It is more explicit. There is no confusion as to which end the element will be removed from.
-   *    2. It is consistent with the naming of DoublyLinkedList's `popFront` and `popBack` methods.
+   *    2. It is consistent with the naming of DoublyLinkedList's `removeFront` and `removeBack` methods.
+   *
+   * Time complexity: O(1)
    *
    * @return the element that was removed.
    */
-  popFront(): T {
+  removeFront(): T {
     if (!this.head) {
-      throw new Error('popFront() called on an empty LinkedList');
+      throw new Error('removeFront() called on an empty LinkedList');
     }
 
     const node = this.head;
@@ -186,6 +185,14 @@ export default class LinkedList<T> {
 
     this._length -= 1;
     return node.element;
+  }
+
+  removeAll(): void {
+    // The nodes will get garbage collected because nothing points to `head` anymore,
+    // so nothing will get marked in the mark & sweep phase.
+    this.head = undefined;
+    this.tail = undefined;
+    this._length = 0;
   }
 
   /**
@@ -276,7 +283,7 @@ export default class LinkedList<T> {
 
     for (let node = this.head; node && i <= lastIndex; node = node.next, i += 1) {
       if (i >= start) {
-        newList.pushBack(node.element);
+        newList.addBack(node.element);
       }
     }
 
@@ -298,7 +305,7 @@ export default class LinkedList<T> {
     const newList = new LinkedList<T>();
 
     for (let node = this.head; node; node = node.next) {
-      newList.pushBack(node.element);
+      newList.addBack(node.element);
     }
 
     return newList;
@@ -313,7 +320,7 @@ export default class LinkedList<T> {
     const newList = new LinkedList<K>();
 
     for (let node = this.head; node; node = node.next) {
-      newList.pushBack(mapperFn(node.element));
+      newList.addBack(mapperFn(node.element));
     }
 
     return newList;
@@ -329,14 +336,29 @@ export default class LinkedList<T> {
 
     for (let node = this.head; node; node = node.next) {
       if (predicateFn(node.element)) {
-        newList.pushBack(node.element);
+        newList.addBack(node.element);
       }
     }
 
     return newList;
   }
 
-  // `reject`
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a list containing only the elements where `predicateFn(element)` evaluates to `false`.
+   */
+  reject(predicateFn: PredicateFn<T>): LinkedList<T> {
+    const newList = new LinkedList<T>();
+
+    for (let node = this.head; node; node = node.next) {
+      if (!predicateFn(node.element)) {
+        newList.addBack(node.element);
+      }
+    }
+
+    return newList;
+  }
 
   /**
    * Time complexity: O(n)
@@ -347,7 +369,7 @@ export default class LinkedList<T> {
     const newList = new LinkedList<T>();
 
     for (let node = this.head; node; node = node.next) {
-      newList.pushFront(node.element);
+      newList.addFront(node.element);
     }
 
     return newList;
