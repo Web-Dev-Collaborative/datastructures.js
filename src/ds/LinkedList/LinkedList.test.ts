@@ -399,4 +399,54 @@ describe('LinkedList', () => {
       expect(() => list.slice(2)).not.toThrow();
     });
   });
+
+  describe('clone', () => {
+    testListIsACopy(l => l.clone(), l => l.head);
+
+    it('creates a full copy of the list', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.clone();
+      expect(newList.toArray()).toEqual(list.toArray());
+    });
+
+    it('returns a list with the same elements from the original list', () => {
+      type Person = { name: string };
+      const l = new LinkedList<Person>();
+      const bob = { name: 'Bob' };
+      l.pushBack(bob);
+      const newList = l.clone();
+      expect(newList.first()).toBe(bob);
+    });
+  });
+
+  describe('map', () => {
+    testListIsACopy(l => l.map(a => a), l => l.head);
+
+    it('returns a new list of the same size', () => {
+      list.pushBack('one');
+      list.pushBack('two');
+      list.pushBack('three');
+      const newList = list.map(a => a);
+      expect(newList.length).toBe(list.length);
+    });
+
+    it('returns a list containing the results of calling the element mapper function on each element in the original list', () => {
+      const l = new LinkedList<number>();
+      l.pushBack(1);
+      l.pushBack(2);
+      l.pushBack(3);
+      const newList = l.map(a => a * a);
+      expect(newList.toArray()).toEqual([1, 4, 9]);
+    });
+
+    it('can return a new list containing a different type of element', () => {
+      type Person = { name: string };
+      list.pushBack('Bob');
+      list.pushBack('Jane');
+      const newList: LinkedList<Person> = list.map(name => ({ name }));
+      expect(newList.toArray()).toEqual([{ name: 'Bob' }, { name: 'Jane' }]);
+    });
+  });
 });

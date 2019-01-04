@@ -28,6 +28,7 @@ const numberToIndex = (num: void | number, size: number): number => {
 };
 
 export type EqualityFn<T> = (a: T, b: T) => boolean;
+export type ElementMapperFn<T, K> = (element: T) => K;
 
 /**
  * Note: The following methods are not implemented because DoublyLinkedList supports
@@ -193,6 +194,9 @@ export default class LinkedList<T> {
   }
 
   /**
+   * This must return a copy of the list and its nodes so that modifications
+   * to one list to not affect the other.
+   *
    * Time complexity: O(n)
    *
    * @return a copy of the list with everything but the first element.
@@ -206,6 +210,9 @@ export default class LinkedList<T> {
   }
 
   /**
+   * This must return a copy of the list and its nodes so that modifications
+   * to one list to not affect the other.
+   *
    * Time complexity: O(n)
    *
    * @return a copy of the list with everything but the last element.
@@ -234,6 +241,9 @@ export default class LinkedList<T> {
   }
 
   /**
+   * This must return a copy of the list and its nodes so that modifications
+   * to one list to not affect the other.
+   *
    * Time complexity: O(n)
    *
    * @return a copy of the part of this list between `start` and `end`.
@@ -252,6 +262,42 @@ export default class LinkedList<T> {
     return newList;
   }
 
+  /**
+   * The returned list contains the same elements as this list.
+   *
+   * Time complexity: O(n)
+   *
+   * @return a complete copy of the list.
+   */
+  clone() {
+    // This could just be an alias for `this.slice()`, but I decided to "duplicate"
+    // this logic because it contains fewer operations/checks than `slice` does.
+    // It's so simple that it's not worth it to incur the extra cost when a full
+    // clone is what you need.
+    const newList = new LinkedList<T>();
+
+    for (let node = this.head; node; node = node.next) {
+      newList.pushBack(node.element);
+    }
+
+    return newList;
+  }
+
+  /**
+   * Time complexity: O(n)
+   *
+   * @return a list containing the results of calling `fn` on each element in this list.
+   */
+  map<K>(fn: ElementMapperFn<T, K>): LinkedList<K> {
+    const newList = new LinkedList<K>();
+
+    for (let node = this.head; node; node = node.next) {
+      newList.pushBack(fn(node.element));
+    }
+
+    return newList;
+  }
+
   // remove(element) - Removes the first (newest) occurrence of element.
   // removeLast(element) - Removes the last (oldest) occurrence of element.
   // removeAll(element) - Removes all occurrences of element.
@@ -261,7 +307,6 @@ export default class LinkedList<T> {
   // notEvery(fn) - Returns true if `fn(element)` returns false for eny element.
   // reverse() - Returns a copy of the list in reverse.
   // filter(fn) -> Returns a new LinkedList containing only the elements where fn(element) is truthy.
-  // clone() - Returns a shallow copy of the list (elements are not cloned).
   // clear() - Removes all elements from the list.
   // forEach(fn) - Iterates over all elements in the list.
   // get(n) - Returns the nth element in the list.
